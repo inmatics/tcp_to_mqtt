@@ -11,6 +11,14 @@ else
 		$(MAKEFILE_LIST) | grep -v '@awk' | sort
 endif
 
+APP_NAME=tcp_to_mqtt
+
 .PHONY: lint
 lint: ### Run linter.
 	golangci-lint run
+
+build: ### Run linter.
+	go build -a -o bin/tcp_to_mqtt ./main.go
+
+serve: build ### Run cli application
+	./bin/tcp_to_mqtt serve
