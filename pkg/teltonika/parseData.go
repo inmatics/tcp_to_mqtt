@@ -92,10 +92,8 @@ func parseData(data []byte, imei string) (elements []Record, err error) {
 func manageElementValue(key uint16, value []byte, el *Record) {
 	var h Decoder
 	h.elements = make(map[string]map[uint16]AvlEncodeKey)
-	// read our opened json as a byte array.
-	byteValue := []byte(FMBXY)
 	fmbxy := make(map[uint16]AvlEncodeKey)
-	err := json.Unmarshal(byteValue, &fmbxy)
+	err := json.Unmarshal([]byte(FMBXY), &fmbxy)
 	if err != nil {
 		log.Panic(err)
 	}
