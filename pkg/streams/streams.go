@@ -3,6 +3,7 @@ package streams
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
 	"log"
 	"time"
 )
@@ -38,6 +39,13 @@ func ToInt64(data []byte) int64 {
 	return y
 }
 
+func ToUInt8(data []byte) uint8 {
+	var y uint8
+	err := binary.Read(bytes.NewReader(data), binary.BigEndian, &y)
+	logFatal(err)
+	return y
+}
+
 func ToTime(data []byte) time.Time {
 	miliseconds := ToInt64(data)
 	seconds := int64(float64(miliseconds) / 1000.0)
@@ -49,4 +57,20 @@ func logFatal(err error) {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func ParseBs2Uint16(bs []byte, offset int) (uint16, error) {
+	// error handling
+	if len(bs) < offset+2 {
+		return 0, fmt.Errorf("ParseBs2Uint16 invalid length of slice %#x , slice len %v , want %v", (bs), len(bs), offset+2)
+	}
+	var sum uint16
+	var order uint32
+	// convert hex byte slice to Uint64
+	for i := offset + 1; i >= offset; i-- {
+		// shift to the left by 8 bits every cycle
+		sum += uint16((bs)[i]) << order
+		order += 8
+	}
+	return sum, nil
 }

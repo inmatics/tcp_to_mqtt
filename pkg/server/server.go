@@ -3,7 +3,7 @@ package server
 import (
 	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
-	"github.com/inmatics/tcp_to_mqtt/teltonika"
+	"github.com/inmatics/tcp_to_mqtt/pkg/teltonika"
 	"golang.org/x/exp/slog"
 	"log"
 	"net"
@@ -28,6 +28,7 @@ func Start(connPort string, mqttBrokerHost string, mqttBrokerPort string) {
 	defer l.Close()
 
 	fmt.Println("TCP server listening on port " + connPort)
+	fmt.Println("Relaying MQTT messages to " + mqttBrokerHost + " on port " + mqttBrokerPort)
 	for {
 		conn, err := l.Accept()
 		logFatal(err)
@@ -38,7 +39,8 @@ func Start(connPort string, mqttBrokerHost string, mqttBrokerPort string) {
 func listen(messages chan string, client mqtt.Client, logger *slog.Logger) func() {
 	return func() {
 		for msg := range messages {
-			token := client.Publish("devices/new", 0, false, msg)
+			topic := "devices/new"
+			token := client.Publish(topic, 0, false, msg)
 			logger.Debug("new message",
 				slog.String("msg", msg),
 			)
