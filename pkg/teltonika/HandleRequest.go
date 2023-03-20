@@ -2,17 +2,13 @@ package teltonika
 
 import (
 	"encoding/hex"
-	"encoding/json"
 	"golang.org/x/exp/slog"
 	"io"
 	"net"
 	"os"
-	"strconv"
-	"strings"
-	"time"
 )
 
-func HandleRequest(conn net.Conn, messages chan string) {
+func HandleRequest(conn net.Conn, messages chan Record) {
 	var b []byte
 	var imei string
 	step := 1
@@ -69,15 +65,11 @@ func HandleRequest(conn net.Conn, messages chan string) {
 
 			for i := 0; i < len(elements); i++ {
 				element := elements[i]
-				bytes, err := json.Marshal(element)
 				if err != nil {
 					return
 				}
-				messages <- string(bytes)
+				messages <- element
 
-				logger.Debug("Parsed data",
-					slog.String("parsed data", string(bytes)),
-				)
 			}
 
 			_, err = conn.Write([]byte{0, 0, 0, uint8(len(elements))})
@@ -87,14 +79,4 @@ func HandleRequest(conn net.Conn, messages chan string) {
 		}
 
 	}
-}
-
-func toString(element Record) string {
-	var elements []string
-	elements = append(elements, element.Imei)
-	elements = append(elements, element.Timestamp.Format(time.RFC3339))
-	elements = append(elements, strconv.FormatFloat(element.Lng, 'f', -1, 64))
-	elements = append(elements, strconv.FormatFloat(element.Lat, 'f', -1, 64))
-	elements = append(elements, strconv.Itoa(int(element.Speed)))
-	return strings.Join(elements, ";")
 }
