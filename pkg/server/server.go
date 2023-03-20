@@ -37,18 +37,18 @@ func Start(connPort string, mqttBrokerHost string, mqttBrokerPort string) {
 	}
 }
 
-func listen(messages chan teltonika.Record, client mqtt.Client, logger *slog.Logger) func() {
+func listen(records chan teltonika.Record, client mqtt.Client, logger *slog.Logger) func() {
 	return func() {
-		for msg := range messages {
-			topic := "devices/new"
-			bytes, err := json.Marshal(msg)
+		for record := range records {
+			bytes, err := json.Marshal(record)
 			logFatal(err)
 
-			token := client.Publish(topic, 0, false, msg)
+			client.Publish("devices/new", 0, false, string(bytes))
+			client.Publish("devices/"+record.Imei, 0, false, string(bytes))
 			logger.Debug("new message",
 				slog.String("msg", string(bytes)),
 			)
-			token.Wait()
+
 		}
 	}
 }
