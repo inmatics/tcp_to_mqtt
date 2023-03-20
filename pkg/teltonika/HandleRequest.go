@@ -7,9 +7,6 @@ import (
 	"io"
 	"net"
 	"os"
-	"strconv"
-	"strings"
-	"time"
 )
 
 func HandleRequest(conn net.Conn, messages chan string) {
@@ -87,14 +84,4 @@ func HandleRequest(conn net.Conn, messages chan string) {
 		}
 
 	}
-}
-
-func toString(element Record) string {
-	var elements []string
-	elements = append(elements, element.Imei)
-	elements = append(elements, element.Timestamp.Format(time.RFC3339))
-	elements = append(elements, strconv.FormatFloat(element.Lng, 'f', -1, 64))
-	elements = append(elements, strconv.FormatFloat(element.Lat, 'f', -1, 64))
-	elements = append(elements, strconv.Itoa(int(element.Speed)))
-	return strings.Join(elements, ";")
 }
