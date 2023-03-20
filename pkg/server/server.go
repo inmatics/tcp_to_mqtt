@@ -1,6 +1,7 @@
 package server
 
 import (
+	"encoding/json"
 	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/inmatics/tcp_to_mqtt/pkg/teltonika"
@@ -19,7 +20,7 @@ func Start(connPort string, mqttBrokerHost string, mqttBrokerPort string) {
 	if token.Wait() && token.Error() != nil {
 		logFatal(token.Error())
 	}
-	messages := make(chan string)
+	messages := make(chan teltonika.Record)
 
 	go listen(messages, client, logger)()
 
@@ -36,13 +37,16 @@ func Start(connPort string, mqttBrokerHost string, mqttBrokerPort string) {
 	}
 }
 
-func listen(messages chan string, client mqtt.Client, logger *slog.Logger) func() {
+func listen(messages chan teltonika.Record, client mqtt.Client, logger *slog.Logger) func() {
 	return func() {
 		for msg := range messages {
 			topic := "devices/new"
+			bytes, err := json.Marshal(msg)
+			logFatal(err)
+
 			token := client.Publish(topic, 0, false, msg)
 			logger.Debug("new message",
-				slog.String("msg", msg),
+				slog.String("msg", string(bytes)),
 			)
 			token.Wait()
 		}
