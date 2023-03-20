@@ -65,6 +65,7 @@ func HandleRequest(conn net.Conn, messages chan Record) {
 
 			for i := 0; i < len(elements); i++ {
 				element := elements[i]
+				element.RawMessage = message
 				if err != nil {
 					return
 				}
