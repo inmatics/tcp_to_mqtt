@@ -16,5 +16,5 @@ type Record struct {
 	Odometer   int32     `json:"odometer,omitempty"`
 	Speed      int16     `json:"speed"`
 	Timestamp  time.Time `json:"timestamp"`
-	RawMessage string
+	RawMessage string    `json:"raw_message"`
 }
