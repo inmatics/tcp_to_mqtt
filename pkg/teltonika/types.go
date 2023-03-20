@@ -4,23 +4,17 @@ import "time"
 
 const PRECISION = 1_0000_000.0
 
-// Struct for Mongo GeoJSON
-type Location struct {
-	Type        string
-	Coordinates []float64
-}
-
 // Record Schema
 type Record struct {
-	Angle     int16
-	Battery   float32 `json:"battery"`
-	Direction int16   `json:"direction"`
-	Ignition  int8    `json:"ignition"`
-	Imei      string
-	Lat       float64 `json:"lat" gorm:"type:decimal(9,6);"`
-	Lng       float64 `json:"lng" gorm:"type:decimal(9,6);"`
-	Location  Location
-	Odometer  int32     `json:"odometer,omitempty"`
-	Speed     int16     `json:"speed"`
-	Timestamp time.Time `json:"timestamp"`
+	Angle      int16
+	Battery    float32 `json:"battery"`
+	Direction  int16   `json:"direction"`
+	Ignition   int8    `json:"ignition"`
+	Imei       string
+	Lat        float64   `json:"lat" gorm:"type:decimal(9,6);"`
+	Lng        float64   `json:"lng" gorm:"type:decimal(9,6);"`
+	Odometer   int32     `json:"odometer,omitempty"`
+	Speed      int16     `json:"speed"`
+	Timestamp  time.Time `json:"timestamp"`
+	RawMessage string    `json:"raw_message"`
 }
