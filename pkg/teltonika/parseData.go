@@ -40,10 +40,8 @@ func parseData(data []byte, imei string) (elements []Record, err error) {
 			Angle:     angle,
 			Direction: angle,
 			Imei:      imei,
-			Location: Location{
-				"Point",
-				[]float64{longitude, latitude},
-			},
+			Lat:       latitude,
+			Lng:       longitude,
 			Speed:     speed,
 			Timestamp: timestamp,
 		}

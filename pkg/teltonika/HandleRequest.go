@@ -93,9 +93,8 @@ func toString(element Record) string {
 	var elements []string
 	elements = append(elements, element.Imei)
 	elements = append(elements, element.Timestamp.Format(time.RFC3339))
-	coords := element.Location.Coordinates
-	elements = append(elements, strconv.FormatFloat(coords[0], 'f', -1, 64))
-	elements = append(elements, strconv.FormatFloat(coords[1], 'f', -1, 64))
+	elements = append(elements, strconv.FormatFloat(element.Lng, 'f', -1, 64))
+	elements = append(elements, strconv.FormatFloat(element.Lat, 'f', -1, 64))
 	elements = append(elements, strconv.Itoa(int(element.Speed)))
 	return strings.Join(elements, ";")
 }
