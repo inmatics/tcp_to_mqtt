@@ -5,15 +5,12 @@ import (
 	"golang.org/x/exp/slog"
 	"io"
 	"net"
-	"os"
 )
 
-func HandleRequest(conn net.Conn, messages chan Record) {
+func HandleRequest(conn net.Conn, messages chan Record, logger *slog.Logger) {
 	var b []byte
 	var imei string
 	step := 1
-	textHandler := slog.NewTextHandler(os.Stdout)
-	logger := slog.New(textHandler)
 	defer func(conn net.Conn) {
 		err := conn.Close()
 		if err != nil {

@@ -11,9 +11,9 @@ import (
 	"os"
 )
 
-func Start(connPort string, mqttBrokerHost string, mqttBrokerPort string) {
-	textHandler := slog.NewTextHandler(os.Stdout)
-	logger := slog.New(textHandler)
+func Start(connPort string, mqttBrokerHost string, mqttBrokerPort string, logLevel string) {
+	logger := getLogger(logLevel)
+
 	opts := mqtt.NewClientOptions().AddBroker(mqttBrokerHost + ":" + mqttBrokerPort)
 	client := mqtt.NewClient(opts)
 	token := client.Connect()
@@ -33,8 +33,18 @@ func Start(connPort string, mqttBrokerHost string, mqttBrokerPort string) {
 	for {
 		conn, err := l.Accept()
 		logFatal(err)
-		go teltonika.HandleRequest(conn, messages)
+		go teltonika.HandleRequest(conn, messages, logger)
 	}
+}
+
+func getLogger(logLevel string) *slog.Logger {
+	programLevel := new(slog.LevelVar)
+	textHandler := slog.HandlerOptions{Level: programLevel}.NewTextHandler(os.Stderr)
+	logger := slog.New(textHandler)
+	if logLevel == "debug" {
+		programLevel.Set(slog.LevelDebug)
+	}
+	return logger
 }
 
 func listen(records chan teltonika.Record, client mqtt.Client, logger *slog.Logger) func() {

@@ -21,7 +21,10 @@ var serveCmd = &cobra.Command{
 		mqttHost, err := cmd.Flags().GetString("mqtt-host")
 		logFatal(err)
 
-		server.Start(strconv.Itoa(tcpPort), mqttHost, strconv.Itoa(mqttPort))
+		logLevel, err := cmd.Flags().GetString("log-level")
+		logFatal(err)
+
+		server.Start(strconv.Itoa(tcpPort), mqttHost, strconv.Itoa(mqttPort), logLevel)
 	},
 }
 
@@ -36,5 +39,6 @@ func init() {
 	serveCmd.Flags().IntP("mqtt-port", "m", 1883, "MQTT broker host to publish to")
 	serveCmd.Flags().StringP("mqtt-host", "i", "localhost", "MQTT broker port to publish to")
 
+	rootCmd.PersistentFlags().StringP("log-level", "l", "", "Zone ID")
 	rootCmd.AddCommand(serveCmd)
 }
