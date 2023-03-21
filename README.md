@@ -14,5 +14,8 @@ go install
 ```
 
 ## Usage
-
+```shell
+tcp_to_mqtt serve --mqtt-port 9999 --log-level debug
+```
+ 
 
