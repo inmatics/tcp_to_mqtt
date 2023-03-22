@@ -55,7 +55,7 @@ func listen(records chan teltonika.Record, client mqtt.Client, logger *slog.Logg
 
 			client.Publish("devices/new", 0, false, string(bytes))
 			client.Publish("devices/"+record.Imei, 0, false, string(bytes))
-			logger.Debug("new message for "+record.Imei,
+			logger.Debug("new message for imei: "+record.Imei,
 				slog.String("msg", string(bytes)),
 			)
 

@@ -2,9 +2,12 @@ package teltonika
 
 import (
 	"encoding/hex"
+	"fmt"
 	"golang.org/x/exp/slog"
 	"io"
+	"log"
 	"net"
+	"strconv"
 )
 
 func HandleRequest(conn net.Conn, messages chan Record, logger *slog.Logger) {
@@ -44,15 +47,29 @@ func HandleRequest(conn net.Conn, messages chan Record, logger *slog.Logger) {
 
 		switch step {
 		case 1:
-			step = 2
-			imei = message
-			_, err := conn.Write(b)
-			if err != nil {
-				logger.Error("Error writing data", err)
+			imeiLength, _ := strconv.ParseInt(message[0:4], 16, 64)
+			if imeiLength != 15 && imeiLength != 16 {
+				log.Println("Error decoding IMEI length (length must be 15 or 16)", imeiLength)
+				declineMessage(conn)
+				break
 			}
-			logger.Debug("New accepted connection",
-				slog.String("IMEI", imei),
-			)
+			imei, err = ParseIMEI(buf[2:size], int(imeiLength))
+
+			if err != nil {
+				log.Println("Error decoding IMEI:", message)
+				declineMessage(conn)
+				break
+			} else {
+				_, err := conn.Write(b)
+				if err != nil {
+					logger.Error("Error writing data", err)
+				}
+				logger.Debug("New accepted connection",
+					slog.String("IMEI", imei),
+				)
+				step = 2
+			}
+
 		case 2:
 			elements, err := parseData(buf, imei)
 			if err != nil {
@@ -77,4 +94,84 @@ func HandleRequest(conn net.Conn, messages chan Record, logger *slog.Logger) {
 		}
 
 	}
+}
+
+func declineMessage(conn net.Conn) {
+	// 0x00 we decline the message
+	_, err := conn.Write([]byte{0})
+
+	if err != nil {
+		log.Println("Error declining message")
+	}
+}
+
+// ParseIMEI takes a pointer to a byte slice including IMEI number encoded as ASCII, IMEI length, offset and returns IMEI as string and error. If len is 15 chars, also do imei validation
+func ParseIMEI(bs []byte, length int) (string, error) {
+	// error handling
+	if len(bs) < 15 {
+		return "", fmt.Errorf("ParseIMEI invalid length of slice %#x , slice len %v , want %v", (bs), len(bs), 8)
+	}
+	// range over slice
+	x := string((bs)[:length])
+
+	if len(x) == 15 {
+		if ValidateIMEI(&x) != true {
+			return "", fmt.Errorf("IMEI %v is invalid", x)
+		}
+	}
+
+	return x, nil
+}
+
+// ValidateIMEI takes pointer to 15 digits long IMEI string, calculate checksum using the Luhn algorithm and return validity as bool
+func ValidateIMEI(imei *string) bool {
+	bs := []byte((*imei))
+
+	if len(bs) != 15 {
+		//log.Printf("Should validate only 15chars long Imei, got %v", len(bs))
+		return false
+	}
+
+	parsed, err := strconv.ParseInt(string(bs[len(bs)-1]), 10, 8)
+	if err != nil {
+		//log.Printf("Unable to parse IMEI digits %v", err)
+		return false
+	}
+	checkSumDigit := int8(parsed)
+	var checkSum uint64
+
+	// make buffer array for Luhn algorithm with len 14 bytes and cap 31 bytes
+	digits := make([]uint8, 14, 31)
+
+	// count Luhn algorithm
+	for i := 0; i < 14; i++ {
+
+		parsed, err = strconv.ParseInt(string(bs[i]), 10, 8)
+		if err != nil {
+			//log.Printf("Unable to parse IMEI digits %v", err)
+			return false
+		}
+
+		digits[i] = uint8(parsed)
+		if i%2 != 0 {
+			digits[i] = digits[i] * 2
+		}
+
+		if digits[i] >= 10 {
+			digits = append(digits, 1)
+			digits[i] = digits[i] % 10
+		}
+	}
+
+	for _, val := range digits {
+		checkSum += uint64(val)
+	}
+
+	// when checkSum is 0, should use 0
+	if checkSumDigit == 0 {
+		return 0 == uint64(checkSumDigit)
+	}
+
+	// return true if divider to 10 is same as the checkSumDigit
+	return ((10 - checkSum%10) == uint64(checkSumDigit))
 }
