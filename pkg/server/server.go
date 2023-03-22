@@ -37,12 +37,11 @@ func Start(connPort string, mqttBrokerHost string, mqttBrokerPort string, logLev
 	}
 }
 
-func getLogger(logLevel string) *slog.Logger {
-	programLevel := new(slog.LevelVar)
-	textHandler := slog.HandlerOptions{Level: programLevel}.NewJSONHandler(os.Stderr)
-	logger := slog.New(textHandler)
-	if logLevel == "debug" {
-		programLevel.Set(slog.LevelDebug)
+func getLogger(level string) *slog.Logger {
+	logLevel := new(slog.LevelVar)
+	logger := slog.New(slog.HandlerOptions{Level: logLevel}.NewJSONHandler(os.Stderr))
+	if level == "debug" {
+		logLevel.Set(slog.LevelDebug)
 	}
 	return logger
 }
