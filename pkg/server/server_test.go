@@ -19,7 +19,7 @@ func TestStart(t *testing.T) {
 	ConnPort := "3064"
 	mqttBrokerHost := "tcp://mqtt.inmatics.io"
 	mqttBrokerPort := "9001"
-	go Start(ConnPort, mqttBrokerHost, mqttBrokerPort)
+	go Start(ConnPort, mqttBrokerHost, mqttBrokerPort, "debug")
 	time.Sleep(500 * time.Millisecond)
 
 	connection, err := net.Dial("tcp", "localhost"+":"+ConnPort)

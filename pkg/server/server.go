@@ -37,12 +37,11 @@ func Start(connPort string, mqttBrokerHost string, mqttBrokerPort string, logLev
 	}
 }
 
-func getLogger(logLevel string) *slog.Logger {
-	programLevel := new(slog.LevelVar)
-	textHandler := slog.HandlerOptions{Level: programLevel}.NewTextHandler(os.Stderr)
-	logger := slog.New(textHandler)
-	if logLevel == "debug" {
-		programLevel.Set(slog.LevelDebug)
+func getLogger(level string) *slog.Logger {
+	logLevel := new(slog.LevelVar)
+	logger := slog.New(slog.HandlerOptions{Level: logLevel}.NewJSONHandler(os.Stderr))
+	if level == "debug" {
+		logLevel.Set(slog.LevelDebug)
 	}
 	return logger
 }
@@ -55,7 +54,7 @@ func listen(records chan teltonika.Record, client mqtt.Client, logger *slog.Logg
 
 			client.Publish("devices/new", 0, false, string(bytes))
 			client.Publish("devices/"+record.Imei, 0, false, string(bytes))
-			logger.Debug("new message for "+record.Imei,
+			logger.Debug("new message for imei: "+record.Imei,
 				slog.String("msg", string(bytes)),
 			)
 
