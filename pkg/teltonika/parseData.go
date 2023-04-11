@@ -3,33 +3,28 @@ package teltonika
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"github.com/inmatics/tcp_to_mqtt/pkg/streams"
 	"log"
 )
 
-func parseData(data []byte, imei string) (elements []Record, err error) {
+func parseData(data []byte, imei string) ([]Record, error) {
 	reader := bytes.NewBuffer(data)
-	// fmt.Println("Reader Size:", reader.Len())
 
 	// Header
 	reader.Next(4)                                 // 4 Zero Bytes
-	streams.ToInt32(reader.Next(4))                // Header
+	reader.Next(4)                                 // Header
 	reader.Next(1)                                 // CodecID
 	recordNumber := streams.ToInt8(reader.Next(1)) // Number of Records
 
-	elements = make([]Record, recordNumber)
+	elements := make([]Record, recordNumber)
 
-	var i int8 = 0
-	for i < recordNumber {
+	for i := 0; i < int(recordNumber); i++ {
 		timestamp := streams.ToTime(reader.Next(8)) // Timestamp
 		reader.Next(1)                              // Priority
 
 		// GPS Element
-		longitudeInt := streams.ToInt32(reader.Next(4)) // Longitude
-		longitude := float64(longitudeInt) / PRECISION
-		latitudeInt := streams.ToInt32(reader.Next(4)) // Latitude
-		latitude := float64(latitudeInt) / PRECISION
+		longitude := float64(streams.ToInt32(reader.Next(4))) / PRECISION // Longitude
+		latitude := float64(streams.ToInt32(reader.Next(4))) / PRECISION  // Latitude
 
 		reader.Next(2)                           // Altitude
 		angle := streams.ToInt16(reader.Next(2)) // Angle
@@ -45,46 +40,22 @@ func parseData(data []byte, imei string) (elements []Record, err error) {
 			Speed:     speed,
 			Timestamp: timestamp,
 		}
-		// IO Events Elements
 
+		// IO Events Elements
 		reader.Next(1) // ioEventID
 		reader.Next(1) // total Elements
 
-		stage := 1
-		for stage <= 4 {
-			stageElements := streams.ToInt8(reader.Next(1))
-
-			var j int8 = 0
-			for j < stageElements {
-				el := streams.ToUInt8(reader.Next(1))
-				elementID, _ := streams.ParseBs2Uint16([]byte{0, 0, el}, 1)
-
-				switch stage {
-				case 1: // One byte IO Elements
-					manageElementValue(elementID, reader.Next(1), &elements[i])
-				case 2: // Two byte IO Elements
-					manageElementValue(elementID, reader.Next(2), &elements[i])
-				case 3: // Four byte IO Elements
-					manageElementValue(elementID, reader.Next(4), &elements[i])
-				case 4: // Eight byte IO Elements
-					manageElementValue(elementID, reader.Next(8), &elements[i])
-				}
-				j++
+		for stage := 1; stage <= 4; stage++ {
+			for j := 0; j < int(streams.ToInt8(reader.Next(1))); j++ {
+				elementID, _ := streams.ParseBs2Uint16([]byte{0, 0, streams.ToUInt8(reader.Next(1))}, 1)
+				manageElementValue(elementID, reader.Next(1<<(stage-1)), &elements[i])
 			}
-			stage++
 		}
-
-		if err != nil {
-			fmt.Println("Error while reading IO Elements")
-			break
-		}
-
-		i++
 	}
 
-	streams.ToInt8(reader.Next(1))  // Number of Records
-	streams.ToInt32(reader.Next(4)) // CRC
-	return
+	reader.Next(1) // Number of Records
+	reader.Next(4) // CRC
+	return elements, nil
 }
 
 func manageElementValue(key uint16, value []byte, el *Record) {
@@ -108,12 +79,10 @@ func manageElementValue(key uint16, value []byte, el *Record) {
 		if avl.PropertyName == "External Voltage" {
 			el.Battery = float32(streams.ToInt16(value)) / 1000
 		}
-
 	case "toUint32":
 		if avl.PropertyName == "Total Odometer" {
 			el.Odometer = streams.ToInt32(value)
 		}
-
 	}
 }
 
