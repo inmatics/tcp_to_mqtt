@@ -1,4 +1,4 @@
-// Package streams Several functions that convert byte slices to various numeric data types,
+// Package streams Several functions that convert byte slices to various numeric data types.ts,
 // as well as a time.Time value.
 package streams
 

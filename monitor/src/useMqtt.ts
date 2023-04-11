@@ -1,21 +1,7 @@
-// Import required dependencies
 import mqtt from "mqtt";
 import { useEffect, useState } from "react";
+import {Record} from "./types";
 
-// Define the Record type for incoming messages
-type Record = {
-    Angle: number;
-    lng: number;
-    odometer: number;
-    raw_message: string;
-    Imei: string;
-    battery: number;
-    ignition: number;
-    lat: number;
-    speed: number;
-    direction: number;
-    timestamp: string
-};
 
 // Custom hook to handle MQTT messages
 export const useMQTT = (brokerUrl: string, topic: string) => {

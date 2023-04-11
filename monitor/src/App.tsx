@@ -1,40 +1,23 @@
 import React from 'react';
-import {Table} from "antd";
-import {useMQTT} from "./useMqtt";
-
-const columns = [
-    {
-        title: 'IMEI',
-        dataIndex: 'Imei',
-        key: 'Imei',
-    },
-    {
-        title: 'Speed',
-        dataIndex: 'speed',
-        key: 'speed',
-    },
-    {
-        title: 'Timestamp',
-        dataIndex: 'timestamp',
-        key: 'timestamp',
-    },
-    {
-        title: 'Lat',
-        dataIndex: 'lat',
-        key: 'lat',
-    },
-    {
-        title: 'Lng',
-        dataIndex: 'lng',
-        key: 'lng',
-    },
-];
+import { useMQTT } from "./useMqtt";
+import MapDisplay from './MapDisplay';
+import RecordsTable from "./Table";
 
 function App() {
+    // Define the MQTT topic and broker URL
     const topic = "devices/new";
-    const brokerUrl = "wss://mqtt.example.com";
+    const brokerUrl = "wss://mqtt.inmatics.io";
 
-    return <Table dataSource={useMQTT(brokerUrl, topic)} columns={columns}/>;
+    // Fetch MQTT data using the custom hook
+    const mqttData = useMQTT(brokerUrl, topic);
+
+    return (
+        <div>
+            <MapDisplay data={mqttData} />
+            <RecordsTable records={mqttData} />
+        </div>
+    );
 }
 
+// Export the App component as the default export
 export default App;
