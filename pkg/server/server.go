@@ -47,12 +47,14 @@ func getLogger(level string) *slog.Logger {
 }
 
 func listen(records chan teltonika.Record, client mqtt.Client, logger *slog.Logger) func() {
+	topic := "devices/new"
+
 	return func() {
 		for record := range records {
 			bytes, err := json.Marshal(record)
 			logFatal(err)
 
-			client.Publish("devices/new", 0, false, string(bytes))
+			client.Publish(topic, 0, false, string(bytes))
 			client.Publish("devices/"+record.Imei, 0, false, string(bytes))
 			logger.Debug("new message for imei: "+record.Imei,
 				slog.String("msg", string(bytes)),
