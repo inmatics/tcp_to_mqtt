@@ -28,14 +28,20 @@ func main() {
 	}
 	_, err = connection.Write(decodeString)
 	if err != nil {
-		log.Fatal("Error reading")
+		log.Fatal("Error writing")
 	}
 
 	buf := make([]byte, 1024)
 	n, err := connection.Read(buf)
+	if err != nil {
+		log.Fatal("Error reading")
+	}
 
 	streams.ToInt8(buf[:n])
 	decodeString, err = hex.DecodeString(ExampleAvlData1)
+	if err != nil {
+		log.Fatal("Error decoding")
+	}
 
 	_, err = connection.Write(decodeString)
 	n, err = connection.Read(buf)
