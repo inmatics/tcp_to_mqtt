@@ -38,12 +38,7 @@ func HandleRequest(conn net.Conn, messages chan Record, logger *slog.Logger) {
 
 		message := hex.EncodeToString(buf[:size])
 
-		logger.Debug("new TCP packet",
-			slog.String("remote address", conn.RemoteAddr().String()),
-			slog.String("local address", conn.LocalAddr().String()),
-			slog.Int("step", 2),
-			slog.Group("message", slog.Int("size", size), slog.String("message", message)),
-		)
+		logPacket(conn, logger, size, message)
 
 		switch step {
 		case 1:
@@ -96,6 +91,15 @@ func HandleRequest(conn net.Conn, messages chan Record, logger *slog.Logger) {
 	}
 }
 
+func logPacket(conn net.Conn, logger *slog.Logger, size int, message string) {
+	logger.Debug("new TCP packet",
+		slog.String("remote address", conn.RemoteAddr().String()),
+		slog.String("local address", conn.LocalAddr().String()),
+		slog.Int("step", 2),
+		slog.Group("message", slog.Int("size", size), slog.String("message", message)),
+	)
+}
+
 func declineMessage(conn net.Conn) {
 	// 0x00 we decline the message
 	_, err := conn.Write([]byte{0})
@@ -115,7 +119,7 @@ func ParseIMEI(bs []byte, length int) (string, error) {
 	x := string((bs)[:length])
 
 	if len(x) == 15 {
-		if ValidateIMEI(&x) != true {
+		if !ValidateIMEI(&x) {
 			return "", fmt.Errorf("IMEI %v is invalid", x)
 		}
 	}

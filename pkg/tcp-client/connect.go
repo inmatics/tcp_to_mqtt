@@ -14,24 +14,40 @@ const (
 
 func main() {
 	ConnPort := "3064"
-	connection, err := net.Dial("tcp", "localhost"+":"+ConnPort)
-	defer connection.Close()
+	connection, _ := net.Dial("tcp", "localhost"+":"+ConnPort)
+	defer func(connection net.Conn) {
+		err := connection.Close()
+		if err != nil {
+			log.Println("Error closing connection.")
+		}
+	}(connection)
 
 	decodeString, err := hex.DecodeString(ExampleImei1)
 	if err != nil {
 		return
 	}
 	_, err = connection.Write(decodeString)
+	if err != nil {
+		logFatal(err)
+	}
 
 	buf := make([]byte, 1024)
 	n, err := connection.Read(buf)
+	logFatal(err)
 
 	streams.ToInt8(buf[:n])
 	decodeString, err = hex.DecodeString(ExampleAvlData1)
+	logFatal(err)
 
 	_, err = connection.Write(decodeString)
-	n, err = connection.Read(buf)
+	logFatal(err)
+
+	_, err = connection.Read(buf)
+	logFatal(err)
+}
+
+func logFatal(err error) {
 	if err != nil {
-		log.Fatal("Error reading")
+		log.Fatal(err)
 	}
 }
