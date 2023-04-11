@@ -48,7 +48,11 @@ func parseData(data []byte, imei string) ([]Record, error) {
 		for stage := 1; stage <= 4; stage++ {
 			for j := 0; j < int(streams.ToInt8(reader.Next(1))); j++ {
 				elementID, _ := streams.ParseBs2Uint16([]byte{0, 0, streams.ToUInt8(reader.Next(1))}, 1)
-				manageElementValue(elementID, reader.Next(1<<(stage-1)), &elements[i])
+				decoder, err := NewDecoder(FMBXY)
+				if err != nil {
+					return nil, err
+				}
+				decoder.manageElementValue(elementID, reader.Next(1<<(stage-1)), &elements[i])
 			}
 		}
 	}
@@ -56,34 +60,6 @@ func parseData(data []byte, imei string) ([]Record, error) {
 	reader.Next(1) // Number of Records
 	reader.Next(4) // CRC
 	return elements, nil
-}
-
-func manageElementValue(key uint16, value []byte, el *Record) {
-	var h Decoder
-	h.elements = make(map[string]map[uint16]AvlEncodeKey)
-	fmbxy := make(map[uint16]AvlEncodeKey)
-	err := json.Unmarshal([]byte(FMBXY), &fmbxy)
-	if err != nil {
-		log.Panic(err)
-	}
-
-	h.elements["FMBXY"] = fmbxy
-	avl, _ := fmbxy[key]
-
-	switch avl.FinalConversion {
-	case "toUint8":
-		if avl.PropertyName == "Ignition" {
-			el.Ignition = streams.ToInt8(value)
-		}
-	case "toUint16":
-		if avl.PropertyName == "External Voltage" {
-			el.Battery = float32(streams.ToInt16(value)) / 1000
-		}
-	case "toUint32":
-		if avl.PropertyName == "Total Odometer" {
-			el.Odometer = streams.ToInt32(value)
-		}
-	}
 }
 
 type Decoder struct {
@@ -103,4 +79,41 @@ type AvlEncodeKey struct {
 	PropertyName    string
 	Type            string
 	Units           string
+}
+
+func NewDecoder(fmbxyJSON string) (*Decoder, error) {
+	fmbxy := make(map[uint16]AvlEncodeKey)
+	err := json.Unmarshal([]byte(fmbxyJSON), &fmbxy)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Decoder{
+		elements: map[string]map[uint16]AvlEncodeKey{
+			"FMBXY": fmbxy,
+		},
+	}, nil
+}
+
+func (d *Decoder) manageElementValue(key uint16, value []byte, el *Record) {
+	avl, ok := d.elements["FMBXY"][key]
+	if !ok {
+		log.Printf("Key not found: %d", key)
+		return
+	}
+
+	switch avl.FinalConversion {
+	case "toUint8":
+		if avl.PropertyName == "Ignition" {
+			el.Ignition = streams.ToInt8(value)
+		}
+	case "toUint16":
+		if avl.PropertyName == "External Voltage" {
+			el.Battery = float32(streams.ToInt16(value)) / 1000
+		}
+	case "toUint32":
+		if avl.PropertyName == "Total Odometer" {
+			el.Odometer = streams.ToInt32(value)
+		}
+	}
 }
