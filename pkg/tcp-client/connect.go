@@ -14,14 +14,22 @@ const (
 
 func main() {
 	ConnPort := "3064"
-	connection, err := net.Dial("tcp", "localhost"+":"+ConnPort)
-	defer connection.Close()
+	connection, _ := net.Dial("tcp", "localhost"+":"+ConnPort)
+	defer func(connection net.Conn) {
+		err := connection.Close()
+		if err != nil {
+			log.Println("Error closing connection.")
+		}
+	}(connection)
 
 	decodeString, err := hex.DecodeString(ExampleImei1)
 	if err != nil {
 		return
 	}
 	_, err = connection.Write(decodeString)
+	if err != nil {
+		log.Fatal("Error reading")
+	}
 
 	buf := make([]byte, 1024)
 	n, err := connection.Read(buf)

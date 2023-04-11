@@ -115,7 +115,7 @@ func ParseIMEI(bs []byte, length int) (string, error) {
 	x := string((bs)[:length])
 
 	if len(x) == 15 {
-		if ValidateIMEI(&x) != true {
+		if !ValidateIMEI(&x) {
 			return "", fmt.Errorf("IMEI %v is invalid", x)
 		}
 	}
