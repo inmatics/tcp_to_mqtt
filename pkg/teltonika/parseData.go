@@ -63,7 +63,7 @@ func parseData(data []byte, imei string) ([]Record, error) {
 }
 
 type Decoder struct {
-	elements map[string]map[uint16]AvlEncodeKey
+	elements map[uint16]AvlEncodeKey
 }
 
 type AvlEncodeKey struct {
@@ -89,14 +89,12 @@ func NewDecoder(fmbxyJSON string) (*Decoder, error) {
 	}
 
 	return &Decoder{
-		elements: map[string]map[uint16]AvlEncodeKey{
-			"FMBXY": fmbxy,
-		},
+		elements: map[uint16]AvlEncodeKey{},
 	}, nil
 }
 
 func (d *Decoder) manageElementValue(key uint16, value []byte, el *Record) {
-	avl, ok := d.elements["FMBXY"][key]
+	avl, ok := d.elements[key]
 	if !ok {
 		log.Printf("Key not found: %d", key)
 		return
