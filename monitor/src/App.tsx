@@ -1,7 +1,7 @@
 import React from 'react';
 import { useMQTT } from "./useMqtt";
-import MapDisplay from './MapDisplay';
 import RecordsTable from "./Table";
+import {Map} from "./Map";
 
 function App() {
     // Define the MQTT topic and broker URL
@@ -13,7 +13,7 @@ function App() {
 
     return (
         <div>
-            <MapDisplay data={mqttData} />
+            <Map entries={mqttData} />
             <RecordsTable records={mqttData} />
         </div>
     );
