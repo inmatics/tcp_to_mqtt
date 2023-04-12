@@ -1,6 +1,6 @@
 // Function to initialize the Leaflet map
 export function initializeMap() {
-    const map = L.map('map').setView([-34, -58], 8);
+    const map = L.map('map').setView([-34, -58], 12);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -19,7 +19,7 @@ export function addOrUpdateMarker(markersByIMEI, imei, lat, lng, map) {
         markersByIMEI[imei].bindPopup(`IMEI: ${imei}<br>Latitude: ${lat}<br>Longitude: ${lng}`).openPopup();
         setTimeout(() => {
             markersByIMEI[imei].closePopup();
-        }, 2000);
+        }, 5000);
     } else {
         const marker = L.marker([lat, lng]).addTo(map)
             .bindPopup(`IMEI: ${imei}<br>Latitude: ${lat}<br>Longitude: ${lng}`)
@@ -27,7 +27,7 @@ export function addOrUpdateMarker(markersByIMEI, imei, lat, lng, map) {
 
         setTimeout(() => {
             marker.closePopup();
-        }, 2000);
+        }, 5000);
 
         markersByIMEI[imei] = marker;
     }
