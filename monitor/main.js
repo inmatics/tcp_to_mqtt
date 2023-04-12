@@ -3,7 +3,7 @@ import { initializeMQTTClient, subscribeToTopic, handleMessage } from './mqtt.js
 
 const map = initializeMap();
 const clientId = 'mqttjs_' + Math.random().toString(16).substr(2, 8);
-const brokerUrl = 'wss://mqtt.inmatics.io:443'; // Replace with your MQTT broker WebSocket URL and port
+const brokerUrl = 'wss://mqtt.example.com:443'; // Replace with your MQTT broker WebSocket URL and port
 const topic = 'devices/new'; // Replace with the topic you want to subscribe to
 const markersByIMEI = {};
 
