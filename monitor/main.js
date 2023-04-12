@@ -8,10 +8,6 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     zoomOffset: -1
 }).addTo(map);
 
-L.marker([51.5, -0.09]).addTo(map)
-    .bindPopup('A marker on the map.')
-    .openPopup();
-
 const clientId = 'mqttjs_' + Math.random().toString(16).substr(2, 8);
 const brokerUrl = 'wss://mqtt.inmatics.io:443'; // Replace with your MQTT broker WebSocket URL and port
 const topic = 'devices/new'; // Replace with the topic you want to subscribe to
@@ -36,18 +32,24 @@ const markersByIMEI = {};
 client.on('message', (topic, message) => {
 
     const data = JSON.parse(message);
-    const {lat, lng, Imei} = data
+    const {lat, lng, Imei, speed} = data
 
-    console.log(markersByIMEI)
     if (!isNaN(lat) && !isNaN(lng)) {
 
         if (markersByIMEI.hasOwnProperty(Imei)) {
             markersByIMEI[Imei].setLatLng([lat, lng]);
             markersByIMEI[Imei].bindPopup(`IMEI: ${Imei}<br>Latitude: ${lat}<br>Longitude: ${lng}`).openPopup();
+            setTimeout(() => {
+                markersByIMEI[Imei].closePopup();
+            }, 5000);
         } else {
             const marker = L.marker([lat, lng]).addTo(map)
-                .bindPopup(`IMEI: ${Imei}<br>Latitude: ${lat}<br>Longitude: ${lng}`)
+                .bindPopup(`IMEI: ${Imei}<br>Latitude: ${lat}<br>Longitude: ${lng}<br> Speed: ${speed}`)
                 .openPopup();
+
+            setTimeout(() => {
+                marker.closePopup();
+            }, 5000);
 
             markersByIMEI[Imei] = marker;
         }
