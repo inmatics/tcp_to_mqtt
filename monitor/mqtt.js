@@ -1,9 +1,8 @@
-import { addOrUpdateMarker } from './map.js';
+import {addOrUpdateMarker} from './map.js';
 
 // Function to initialize the MQTT client
 export function initializeMQTTClient(brokerUrl, clientId) {
-    const client = mqtt.connect(brokerUrl, { clientId });
-    return client;
+    return mqtt.connect(brokerUrl, {clientId});
 }
 
 // Function to subscribe to an MQTT topic
