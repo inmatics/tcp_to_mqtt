@@ -1,12 +1,6 @@
-import * as mqtt from 'mqtt';
-import { MqttClient } from 'mqtt';
-import { MarkerManager } from './map';
-
-
-export function initializeMQTTClient(brokerUrl: string, clientId: string): MqttClient {
-    const client = mqtt.connect(brokerUrl, { clientId });
-    return client;
-}
+import {MqttClient} from 'mqtt';
+import {MarkerManager} from './map';
+import {Record} from "./types";
 
 export function subscribeToTopic(client: MqttClient, topic: string): void {
     client.subscribe(topic, (err) => {
@@ -19,11 +13,10 @@ export function subscribeToTopic(client: MqttClient, topic: string): void {
 }
 
 export function handleMessage(markerManager: MarkerManager, topic: string, message: Buffer, map: L.Map): void {
-    const data = JSON.parse(message.toString());
-    const { lat, lng, Imei } = data;
+    const data : Record = JSON.parse(message.toString());
 
-    if (!isNaN(lat) && !isNaN(lng)) {
-        markerManager.addOrUpdateMarker(Imei, lat, lng, map);
+    if (!isNaN(data.lat) && !isNaN(data.lng)) {
+        markerManager.addOrUpdateMarker(data, map);
     } else {
         console.error('Invalid latitude and longitude in received message');
     }
