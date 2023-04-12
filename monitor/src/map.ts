@@ -23,20 +23,20 @@ export function createMarkerManager(): MarkerManager {
     const markersByIMEI: { [imei: string]: L.Marker } = {};
 
     function addOrUpdateMarker(record: Record, map: L.Map): void {
-        const {Imei, lat, lng} = record
+        const {imei, lat, lng} = record
 
         const content = `<div>
-                                    IMEI: ${Imei}<br>
+                                    IMEI: ${imei}<br>
                                     Speed: ${record.speed} km/h<br>
                                     Battery: ${record.battery}<br>
                                     Ignition: ${record.ignition}<br>
                                     </div>`;
-        if (markersByIMEI.hasOwnProperty(Imei)) {
-            markersByIMEI[Imei].setLatLng([lat, lng]);
-            markersByIMEI[Imei].bindPopup(content);
+        if (markersByIMEI.hasOwnProperty(imei)) {
+            markersByIMEI[imei].setLatLng([lat, lng]);
+            markersByIMEI[imei].bindPopup(content);
 
         } else {
-            markersByIMEI[Imei] = L.marker([lat, lng]).addTo(map)
+            markersByIMEI[imei] = L.marker([lat, lng]).addTo(map)
                 .bindPopup(content);
         }
     }

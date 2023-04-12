@@ -1,10 +1,10 @@
 // Define the Record type for incoming messages
 export type Record = {
-    Angle: number;
+    angle: number;
     lng: number;
     odometer: number;
     raw_message: string;
-    Imei: string;
+    imei: string;
     battery: number;
     ignition: number;
     lat: number;
