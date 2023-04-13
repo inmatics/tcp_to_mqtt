@@ -46,8 +46,13 @@ export function createMarkerManager(): MarkerManager {
 
         if (itemList) {
             Object.values(records).forEach((item) => {
-                console.log(item)
-                const li = document.createElement("li");
+                let li;
+                li = document.getElementById(item.imei);
+                if (!li) {
+                    li = document.createElement("li");
+                    li.id = item.imei
+                }
+
                 const a = document.createElement("a");
                 li.textContent = item.imei;
                 a.href = "#";
@@ -56,7 +61,6 @@ export function createMarkerManager(): MarkerManager {
             });
         }
     }
-
 
 
     return {

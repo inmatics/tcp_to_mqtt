@@ -1,4 +1,4 @@
-import {initializeMap} from './map';
+import {createMarkerManager, initializeMap} from './map';
 import {handleMessage, subscribeToTopic} from './mqtt';
 import * as mqtt from "mqtt";
 
@@ -9,8 +9,9 @@ client.on('connect', () => {
     subscribeToTopic(client, 'devices/new');
 });
 
+const markerManager = createMarkerManager();
 client.on('message', (topic: string, message: Buffer) => {
-    handleMessage(topic, message, map);
+    handleMessage(markerManager, topic, message, map);
 });
 
 document.addEventListener("DOMContentLoaded", function() {

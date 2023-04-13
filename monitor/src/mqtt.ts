@@ -1,5 +1,5 @@
 import {MqttClient} from 'mqtt';
-import {createMarkerManager, MarkerManager} from './map';
+import {MarkerManager} from './map';
 import {Record} from "./types";
 
 export function subscribeToTopic(client: MqttClient, topic: string): void {
@@ -12,8 +12,7 @@ export function subscribeToTopic(client: MqttClient, topic: string): void {
     });
 }
 
-export function handleMessage( topic: string, message: Buffer, map: L.Map): void {
-    const markerManager = createMarkerManager()
+export function handleMessage(markerManager: MarkerManager, topic: string, message: Buffer, map: L.Map): void {
     const data : Record = JSON.parse(message.toString());
 
     if (!isNaN(data.lat) && !isNaN(data.lng)) {
