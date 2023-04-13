@@ -88,9 +88,7 @@ func NewDecoder(fmbxyJSON string) (*Decoder, error) {
 		return nil, err
 	}
 
-	return &Decoder{
-		elements: map[uint16]AvlEncodeKey{},
-	}, nil
+	return &Decoder{elements: fmbxy}, nil
 }
 
 func (d *Decoder) manageElementValue(key uint16, value []byte, el *Record) {
