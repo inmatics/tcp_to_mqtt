@@ -23,27 +23,10 @@ export function createMarkerManager(): MarkerManager {
     const markersByIMEI: { [imei: string]: L.Marker } = {};
     const records: { [imei: string]: Record } = {};
 
-    function addOrUpdateMarker(record: Record, map: L.Map): void {
-        const {imei, lat, lng} = record
+    function updateImeiList(imei: string, record: Record) {
         records[imei] = record
 
-        const content = `<div>
-                                    IMEI: ${imei}<br>
-                                    Speed: ${record.speed} km/h<br>
-                                    Battery: ${record.battery}<br>
-                                    Ignition: ${record.ignition}<br>
-                                    </div>`;
-        if (markersByIMEI.hasOwnProperty(imei)) {
-            markersByIMEI[imei].setLatLng([lat, lng]);
-            markersByIMEI[imei].bindPopup(content);
-
-        } else {
-            markersByIMEI[imei] = L.marker([lat, lng]).addTo(map)
-                .bindPopup(content);
-        }
-
         const itemList = document.getElementById("item-list");
-
         if (itemList) {
             Object.values(records).forEach((item) => {
                 let li;
@@ -60,6 +43,27 @@ export function createMarkerManager(): MarkerManager {
                 itemList.appendChild(li);
             });
         }
+    }
+
+    function addOrUpdateMarker(record: Record, map: L.Map): void {
+        const {imei, lat, lng} = record
+
+        const content = `<div>
+                                    IMEI: ${imei}<br>
+                                    Speed: ${record.speed} km/h<br>
+                                    Battery: ${record.battery}<br>
+                                    Ignition: ${record.ignition}<br>
+                                    </div>`;
+        if (markersByIMEI.hasOwnProperty(imei)) {
+            markersByIMEI[imei].setLatLng([lat, lng]);
+            markersByIMEI[imei].bindPopup(content);
+
+        } else {
+            markersByIMEI[imei] = L.marker([lat, lng]).addTo(map)
+                .bindPopup(content);
+        }
+
+        updateImeiList(imei, record);
     }
 
 
