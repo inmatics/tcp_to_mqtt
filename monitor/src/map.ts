@@ -21,14 +21,14 @@ export function initializeMap(): L.Map {
 
 export function createMarkerManager(): MarkerManager {
     const markersByIMEI: { [imei: string]: L.Marker } = {};
-    const records: { [imei: string]: Record } = {};
+    const recordsByImei: { [imei: string]: Record } = {};
 
-    function updateImeiList(imei: string, record: Record) {
-        records[imei] = record
+    function updateImeiList(record: Record) {
+        recordsByImei[record.imei] = record
 
         const itemList = document.getElementById("item-list");
         if (itemList) {
-            Object.values(records).forEach((item) => {
+            Object.values(recordsByImei).forEach((item) => {
                 let li;
                 li = document.getElementById(item.imei);
                 if (!li) {
@@ -63,7 +63,7 @@ export function createMarkerManager(): MarkerManager {
                 .bindPopup(content);
         }
 
-        updateImeiList(imei, record);
+        updateImeiList(record);
     }
 
 
