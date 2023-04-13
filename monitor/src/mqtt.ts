@@ -1,5 +1,5 @@
 import {MqttClient} from 'mqtt';
-import {MarkerManager} from './map';
+import {UIManager} from './ui';
 import {Record} from "./types";
 
 export function subscribeToTopic(client: MqttClient, topic: string): void {
@@ -12,11 +12,11 @@ export function subscribeToTopic(client: MqttClient, topic: string): void {
     });
 }
 
-export function handleMessage(markerManager: MarkerManager, topic: string, message: Buffer, map: L.Map): void {
+export function handleMessage(ui: UIManager, topic: string, message: Buffer, map: L.Map): void {
     const data : Record = JSON.parse(message.toString());
 
     if (!isNaN(data.lat) && !isNaN(data.lng)) {
-        markerManager.addOrUpdateMarker(data, map);
+        ui.update(data, map);
     } else {
         console.error('Invalid latitude and longitude in received message');
     }

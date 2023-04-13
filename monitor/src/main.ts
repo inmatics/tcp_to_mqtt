@@ -1,4 +1,4 @@
-import {createMarkerManager, initializeMap} from './map';
+import {createUIManager, initializeMap} from './ui';
 import {handleMessage, subscribeToTopic} from './mqtt';
 import * as mqtt from "mqtt";
 
@@ -9,7 +9,7 @@ client.on('connect', () => {
     subscribeToTopic(client, 'devices/new');
 });
 
-const markerManager = createMarkerManager();
+const markerManager = createUIManager();
 client.on('message', (topic: string, message: Buffer) => {
     handleMessage(markerManager, topic, message, map);
 });

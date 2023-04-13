@@ -1,9 +1,8 @@
 import L from 'leaflet';
 import {Record} from "./types";
 
-
-export interface MarkerManager {
-    addOrUpdateMarker: (record: Record, map: L.Map) => void;
+export interface UIManager {
+    update: (record: Record, map: L.Map) => void;
 }
 
 export function initializeMap(): L.Map {
@@ -19,7 +18,7 @@ export function initializeMap(): L.Map {
     return map;
 }
 
-export function createMarkerManager(): MarkerManager {
+export function createUIManager(): UIManager {
     const markersByIMEI: { [imei: string]: L.Marker } = {};
     const recordsByImei: { [imei: string]: Record } = {};
 
@@ -63,11 +62,14 @@ export function createMarkerManager(): MarkerManager {
                 .bindPopup(content);
         }
 
+    }
+
+    function update(record: Record, map: L.Map): void {
+        addOrUpdateMarker(record, map)
         updateImeiList(record);
     }
 
-
     return {
-        addOrUpdateMarker
+        update
     };
 }
