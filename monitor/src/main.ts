@@ -1,19 +1,30 @@
-import { initializeMap, createMarkerManager } from './map';
-import { subscribeToTopic, handleMessage } from './mqtt';
+import {initializeMap} from './map';
+import {handleMessage, subscribeToTopic} from './mqtt';
 import * as mqtt from "mqtt";
 
 const map = initializeMap();
-const clientId = 'mqttjs_' + Math.random().toString(16).substr(2, 8);
-const brokerUrl = 'wss://mqtt.example.com:443'; // Replace with your MQTT broker WebSocket URL and port
-const topic = 'devices/new'; // Replace with the topic you want to subscribe to
-const markerManager = createMarkerManager();
-
-const client = mqtt.connect(brokerUrl, {clientId})
+const client = mqtt.connect('wss://mqtt.inmatics.io:443', {clientId: 'mqttjs_' + Math.random().toString(16).substr(2, 8)})
 
 client.on('connect', () => {
-    subscribeToTopic(client, topic);
+    subscribeToTopic(client, 'devices/new');
 });
 
 client.on('message', (topic: string, message: Buffer) => {
-    handleMessage(markerManager, topic, message, map);
+    handleMessage(topic, message, map);
+});
+
+document.addEventListener("DOMContentLoaded", function() {
+    const elementId = "sidebar";
+
+    const toggleSidebar = () => {
+        const sidebar = document.getElementById(elementId);
+        if (sidebar) {
+            sidebar.classList.toggle("collapsed");
+        }
+    }
+
+    const toggleButton = document.querySelector(".toggle-sidebar");
+    if (toggleButton) {
+        toggleButton.addEventListener("click", toggleSidebar);
+    }
 });

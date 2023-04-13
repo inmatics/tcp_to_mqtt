@@ -21,9 +21,11 @@ export function initializeMap(): L.Map {
 
 export function createMarkerManager(): MarkerManager {
     const markersByIMEI: { [imei: string]: L.Marker } = {};
+    const records: { [imei: string]: Record } = {};
 
     function addOrUpdateMarker(record: Record, map: L.Map): void {
         const {imei, lat, lng} = record
+        records[imei] = record
 
         const content = `<div>
                                     IMEI: ${imei}<br>
@@ -39,7 +41,23 @@ export function createMarkerManager(): MarkerManager {
             markersByIMEI[imei] = L.marker([lat, lng]).addTo(map)
                 .bindPopup(content);
         }
+
+        const itemList = document.getElementById("item-list");
+
+        if (itemList) {
+            Object.values(records).forEach((item) => {
+                console.log(item)
+                const li = document.createElement("li");
+                const a = document.createElement("a");
+                li.textContent = item.imei;
+                a.href = "#";
+                li.appendChild(a);
+                itemList.appendChild(li);
+            });
+        }
     }
+
+
 
     return {
         addOrUpdateMarker
