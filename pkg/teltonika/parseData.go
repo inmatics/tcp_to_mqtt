@@ -97,7 +97,7 @@ func manageElementValue(key uint16, value []byte, el *Record) {
 	}
 
 	h.elements["FMBXY"] = fmbxy
-	avl, _ := fmbxy[key]
+	avl := fmbxy[key]
 
 	switch avl.FinalConversion {
 	case "toUint8":

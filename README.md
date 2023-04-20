@@ -15,7 +15,7 @@ go install
 
 ## Usage
 ```shell
-tcp_to_mqtt serve --mqtt-port 9999 --log-level debug
+tcp_to_mqtt serve --mqtt-port 9999  --tcp-port 9000 mqtt-host mqtt.example.com --log-level debug
 ```
  
 

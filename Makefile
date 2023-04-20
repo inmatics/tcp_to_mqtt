@@ -17,7 +17,7 @@ APP_NAME=tcp_to_mqtt
 lint: ### Run linter.
 	golangci-lint run
 
-build: ### Run linter.
+build: ### Build.
 	go build -a -o bin/tcp_to_mqtt ./main.go
 
 serve: build ### Run cli application
