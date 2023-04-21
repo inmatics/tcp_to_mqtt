@@ -30,7 +30,7 @@ func HandleRequest(conn net.Conn, messages chan Record, logger *slog.Logger) {
 			if err == io.EOF {
 				break
 			}
-			logger.Error("error reading TCP connection", err)
+			logger.Error("error reading TCP connection", err, imei)
 			return
 		}
 
