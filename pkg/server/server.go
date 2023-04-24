@@ -17,11 +17,15 @@ func Start(cfg *config.Config) {
 	logger := getLogger(cfg.LogLevel)
 
 	mqttPort := strconv.Itoa(cfg.MqttPort)
-	opts := mqtt.NewClientOptions().AddBroker(cfg.MqttHost + ":" + mqttPort)
+	server := cfg.MqttHost + ":" + mqttPort
+
+	opts := mqtt.NewClientOptions().AddBroker(server)
+	opts.SetUsername(cfg.MqttUser)
+	opts.SetPassword(cfg.MqttPassword)
 	client := mqtt.NewClient(opts)
 	token := client.Connect()
 	if token.Wait() && token.Error() != nil {
-		log.Println("Error connecting to broker")
+		log.Println("Error connecting to broker " + server)
 		logFatal(token.Error())
 	}
 	messages := make(chan teltonika.Record)
