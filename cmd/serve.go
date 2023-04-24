@@ -4,6 +4,7 @@ import (
 	"github.com/inmatics/tcp_to_mqtt/pkg/config"
 	"github.com/inmatics/tcp_to_mqtt/pkg/server"
 	"github.com/spf13/cobra"
+	"log"
 )
 
 func extractConfig(cmd *cobra.Command) (*config.Config, error) {
@@ -43,15 +44,19 @@ func extractConfig(cmd *cobra.Command) (*config.Config, error) {
 	return cfg, nil
 }
 
+func logFatal(err error) {
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
 var serveCmd = &cobra.Command{
 	Use:   "serve",
 	Short: "Starts new server",
 	Run: func(cmd *cobra.Command, args []string) {
 
 		config, err := extractConfig(cmd)
-		if err != nil {
-			return
-		}
+		logFatal(err)
 
 		server.Start(config)
 	},
@@ -59,7 +64,9 @@ var serveCmd = &cobra.Command{
 
 func init() {
 	serveCmd.Flags().IntP("tcp-port", "p", 3064, "TCP port to listen on")
-	serveCmd.Flags().IntP("mqtt-port", "m", 1883, "MQTT broker host to publish to")
+	serveCmd.Flags().IntP("mqtt-port", "m", 1883, "MQTT broker port to publish to")
+	serveCmd.Flags().StringP("mqtt-host", "i", "localhost", "MQTT broker host to publish to")
+
 	serveCmd.Flags().StringP("mqtt-user", "u", "", "MQTT broker user")
 	serveCmd.Flags().StringP("mqtt-password", "P", "", "MQTT broker password")
 
