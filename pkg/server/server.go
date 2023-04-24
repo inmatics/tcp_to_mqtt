@@ -4,17 +4,20 @@ import (
 	"encoding/json"
 	"fmt"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"github.com/inmatics/tcp_to_mqtt/pkg/config"
 	"github.com/inmatics/tcp_to_mqtt/pkg/teltonika"
 	"golang.org/x/exp/slog"
 	"log"
 	"net"
 	"os"
+	"strconv"
 )
 
-func Start(connPort string, mqttBrokerHost string, mqttBrokerPort string, logLevel string) {
-	logger := getLogger(logLevel)
+func Start(cfg *config.Config) {
+	logger := getLogger(cfg.LogLevel)
 
-	opts := mqtt.NewClientOptions().AddBroker(mqttBrokerHost + ":" + mqttBrokerPort)
+	mqttPort := strconv.Itoa(cfg.MqttPort)
+	opts := mqtt.NewClientOptions().AddBroker(cfg.MqttHost + ":" + mqttPort)
 	client := mqtt.NewClient(opts)
 	token := client.Connect()
 	if token.Wait() && token.Error() != nil {
@@ -24,12 +27,13 @@ func Start(connPort string, mqttBrokerHost string, mqttBrokerPort string, logLev
 
 	go listen(messages, client, logger)()
 
-	l, err := net.Listen("tcp", "0.0.0.0:"+connPort)
+	tcpPort := strconv.Itoa(cfg.TcpPort)
+	l, err := net.Listen("tcp", "0.0.0.0:"+tcpPort)
 	logFatal(err)
 	defer l.Close()
 
-	fmt.Println("TCP server listening on port " + connPort)
-	fmt.Println("Relaying MQTT messages to " + mqttBrokerHost + " on port " + mqttBrokerPort)
+	fmt.Println("TCP server listening on port " + tcpPort)
+	fmt.Println("Relaying MQTT messages to " + cfg.MqttHost + " on port " + mqttPort)
 	for {
 		conn, err := l.Accept()
 		logFatal(err)
