@@ -21,6 +21,7 @@ func Start(cfg *config.Config) {
 	client := mqtt.NewClient(opts)
 	token := client.Connect()
 	if token.Wait() && token.Error() != nil {
+		log.Println("Error connecting to broker")
 		logFatal(token.Error())
 	}
 	messages := make(chan teltonika.Record)
