@@ -1,0 +1,48 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+}
+
+.header {
+    background-color: #333;
+    color: #fff;
+    padding: 1rem;
+    text-align: center;
+}
+
+.wrapper {
+    display: flex;
+}
+
+.sidebar {
+    background-color: #eee;
+    width: 200px;
+    padding: 1rem;
+    transition: width 0.3s ease;
+}
+
+.sidebar.collapsed {
+    width: 0;
+}
+
+.toggle-sidebar {
+    background-color: #333;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+}
+
+.content {
+    flex-grow: 1;
+}
+
+section {
+    margin-bottom: 1rem;
+}
