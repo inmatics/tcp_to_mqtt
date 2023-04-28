@@ -9,7 +9,7 @@ import (
 
 var rootCmd = &cobra.Command{
 	Use:   "tcp_to_mqtt",
-	Short: "Tool to create a daemon that list for TCP connections and publishes MQTT topics",
+	Short: "Tool to create a daemon that listens for TCP connections and publishes MQTT topics",
 }
 
 // Execute root command

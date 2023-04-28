@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/hex"
+	"github.com/inmatics/tcp_to_mqtt/pkg/config"
 	"github.com/inmatics/tcp_to_mqtt/pkg/streams"
 	"log"
 	"net"
@@ -18,8 +19,16 @@ const (
 func TestStart(t *testing.T) {
 	ConnPort := "3064"
 	mqttBrokerHost := "tcp://mqtt.inmatics.io"
-	mqttBrokerPort := "9001"
-	go Start(ConnPort, mqttBrokerHost, mqttBrokerPort, "debug")
+
+	cfg := config.Config{
+		TcpPort:      3064,
+		MqttPort:     9001,
+		MqttHost:     mqttBrokerHost,
+		LogLevel:     "debug",
+		MqttPassword: "secret",
+		MqttUser:     "user",
+	}
+	go Start(&cfg)
 	time.Sleep(500 * time.Millisecond)
 
 	connection, err := net.Dial("tcp", "localhost"+":"+ConnPort)
