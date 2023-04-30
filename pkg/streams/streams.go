@@ -13,14 +13,15 @@ import (
 func ToInt8(data []byte) int8 {
 	var y int8
 	err := binary.Read(bytes.NewReader(data), binary.BigEndian, &y)
-	logFatal(err)
+	logError(err)
+
 	return y
 }
 
 func ToInt16(data []byte) int16 {
 	var y int16
 	err := binary.Read(bytes.NewReader(data), binary.BigEndian, &y)
-	logFatal(err)
+	logError(err)
 	return y
 }
 
@@ -30,21 +31,21 @@ func ToInt32(data []byte) int32 {
 	if y>>31 == 1 {
 		y *= -1
 	}
-	logFatal(err)
+	logError(err)
 	return y
 }
 
 func ToInt64(data []byte) int64 {
 	var y int64
 	err := binary.Read(bytes.NewReader(data), binary.BigEndian, &y)
-	logFatal(err)
+	logError(err)
 	return y
 }
 
 func ToUInt8(data []byte) uint8 {
 	var y uint8
 	err := binary.Read(bytes.NewReader(data), binary.BigEndian, &y)
-	logFatal(err)
+	logError(err)
 	return y
 }
 
@@ -55,9 +56,9 @@ func ToTime(data []byte) time.Time {
 	return time.Unix(seconds, nanoseconds)
 }
 
-func logFatal(err error) {
+func logError(err error) {
 	if err != nil {
-		log.Fatal(err)
+		log.Println("Error reading stream: ", err)
 	}
 }
 
