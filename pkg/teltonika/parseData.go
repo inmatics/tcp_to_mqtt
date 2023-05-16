@@ -4,8 +4,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/inmatics/tcp_to_mqtt/pkg/streams"
 	"log"
+
+	"github.com/inmatics/tcp_to_mqtt/pkg/streams"
 )
 
 func parseData(data []byte, imei string) (elements []Record, err error) {

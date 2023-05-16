@@ -2,9 +2,10 @@ package main
 
 import (
 	"encoding/hex"
-	"github.com/inmatics/tcp_to_mqtt/pkg/streams"
 	"log"
 	"net"
+
+	"github.com/inmatics/tcp_to_mqtt/pkg/streams"
 )
 
 const (
