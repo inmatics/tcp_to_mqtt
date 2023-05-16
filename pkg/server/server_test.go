@@ -2,12 +2,13 @@ package server
 
 import (
 	"encoding/hex"
-	"github.com/inmatics/tcp_to_mqtt/pkg/config"
-	"github.com/inmatics/tcp_to_mqtt/pkg/streams"
 	"log"
 	"net"
 	"testing"
 	"time"
+
+	"github.com/inmatics/tcp_to_mqtt/pkg/config"
+	"github.com/inmatics/tcp_to_mqtt/pkg/streams"
 )
 
 const (
@@ -72,7 +73,7 @@ func TestStart(t *testing.T) {
 		t.Error("Server response should be 2")
 	}
 
-	//os.Exit(0)
+	// os.Exit(0)
 }
 
 func asserServerResponse(serverResponse int8) {

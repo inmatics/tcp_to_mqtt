@@ -3,14 +3,15 @@ package server
 import (
 	"encoding/json"
 	"fmt"
-	mqtt "github.com/eclipse/paho.mqtt.golang"
-	"github.com/inmatics/tcp_to_mqtt/pkg/config"
-	"github.com/inmatics/tcp_to_mqtt/pkg/teltonika"
-	"golang.org/x/exp/slog"
 	"log"
 	"net"
 	"os"
 	"strconv"
+
+	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"github.com/inmatics/tcp_to_mqtt/pkg/config"
+	"github.com/inmatics/tcp_to_mqtt/pkg/teltonika"
+	"golang.org/x/exp/slog"
 )
 
 func Start(cfg *config.Config) {
@@ -59,7 +60,10 @@ func listen(records chan teltonika.Record, client mqtt.Client, logger *slog.Logg
 	return func() {
 		for record := range records {
 			bytes, err := json.Marshal(record)
-			logFatal(err)
+			if err != nil {
+				logger.Error("error marshalling teltonika record: ", record, err.Error())
+				return
+			}
 
 			client.Publish("devices/new", 0, false, string(bytes))
 			client.Publish("devices/"+record.Imei, 0, false, string(bytes))

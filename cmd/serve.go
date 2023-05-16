@@ -1,10 +1,11 @@
 package cmd
 
 import (
+	"log"
+
 	"github.com/inmatics/tcp_to_mqtt/pkg/config"
 	"github.com/inmatics/tcp_to_mqtt/pkg/server"
 	"github.com/spf13/cobra"
-	"log"
 )
 
 func extractConfig(cmd *cobra.Command) (*config.Config, error) {
@@ -54,7 +55,6 @@ var serveCmd = &cobra.Command{
 	Use:   "serve",
 	Short: "Starts new server",
 	Run: func(cmd *cobra.Command, args []string) {
-
 		config, err := extractConfig(cmd)
 		logFatal(err)
 

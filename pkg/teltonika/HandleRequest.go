@@ -3,11 +3,12 @@ package teltonika
 import (
 	"encoding/hex"
 	"fmt"
-	"golang.org/x/exp/slog"
 	"io"
 	"log"
 	"net"
 	"strconv"
+
+	"golang.org/x/exp/slog"
 )
 
 func HandleRequest(conn net.Conn, messages chan Record, logger *slog.Logger) {
@@ -30,7 +31,7 @@ func HandleRequest(conn net.Conn, messages chan Record, logger *slog.Logger) {
 			if err == io.EOF {
 				break
 			}
-			//https://github.com/golang/go/discussions/54763
+			// https://github.com/golang/go/discussions/54763
 			logger.Error("error reading TCP connection", err.Error(), imei)
 			return
 		}
@@ -104,7 +105,6 @@ func logPacket(conn net.Conn, logger *slog.Logger, size int, message string) {
 func declineMessage(conn net.Conn) {
 	// 0x00 we decline the message
 	_, err := conn.Write([]byte{0})
-
 	if err != nil {
 		log.Println("Error declining message")
 	}
@@ -133,13 +133,13 @@ func ValidateIMEI(imei *string) bool {
 	bs := []byte((*imei))
 
 	if len(bs) != 15 {
-		//log.Printf("Should validate only 15chars long Imei, got %v", len(bs))
+		// log.Printf("Should validate only 15chars long Imei, got %v", len(bs))
 		return false
 	}
 
 	parsed, err := strconv.ParseInt(string(bs[len(bs)-1]), 10, 8)
 	if err != nil {
-		//log.Printf("Unable to parse IMEI digits %v", err)
+		// log.Printf("Unable to parse IMEI digits %v", err)
 		return false
 	}
 	checkSumDigit := int8(parsed)
@@ -153,7 +153,7 @@ func ValidateIMEI(imei *string) bool {
 
 		parsed, err = strconv.ParseInt(string(bs[i]), 10, 8)
 		if err != nil {
-			//log.Printf("Unable to parse IMEI digits %v", err)
+			// log.Printf("Unable to parse IMEI digits %v", err)
 			return false
 		}
 
@@ -178,5 +178,5 @@ func ValidateIMEI(imei *string) bool {
 	}
 
 	// return true if divider to 10 is same as the checkSumDigit
-	return ((10 - checkSum%10) == uint64(checkSumDigit))
+	return (10 - checkSum%10) == uint64(checkSumDigit)
 }
