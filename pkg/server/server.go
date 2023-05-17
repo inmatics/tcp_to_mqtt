@@ -36,7 +36,12 @@ func Start(cfg *config.Config) {
 	tcpPort := strconv.Itoa(cfg.TcpPort)
 	l, err := net.Listen("tcp", "0.0.0.0:"+tcpPort)
 	logFatal(err)
-	defer l.Close()
+	defer func(l net.Listener) {
+		err := l.Close()
+		if err != nil {
+			log.Println("error closing connection")
+		}
+	}(l)
 
 	fmt.Println("TCP server listening on port " + tcpPort)
 	fmt.Println("Relaying MQTT messages to " + cfg.MqttHost + " on port " + mqttPort)
@@ -56,9 +61,9 @@ func getLogger(level string) *slog.Logger {
 	return logger
 }
 
-func listen(records chan teltonika.Record, client mqtt.Client, logger *slog.Logger) func() {
+func listen(recordsChannel <-chan teltonika.Record, client mqtt.Client, logger *slog.Logger) func() {
 	return func() {
-		for record := range records {
+		for record := range recordsChannel {
 			bytes, err := json.Marshal(record)
 			if err != nil {
 				logger.Error("error marshalling teltonika record: ", record, err.Error())

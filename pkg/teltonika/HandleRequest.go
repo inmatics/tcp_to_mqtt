@@ -11,7 +11,7 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-func HandleRequest(conn net.Conn, messages chan Record, logger *slog.Logger) {
+func HandleRequest(conn net.Conn, recordsCannel chan Record, logger *slog.Logger) {
 	var b []byte
 	var imei string
 	step := 1
@@ -20,7 +20,7 @@ func HandleRequest(conn net.Conn, messages chan Record, logger *slog.Logger) {
 		if err != nil {
 			logger.Error("error closing connection", err)
 		}
-		logger.Info("connection closed successfully")
+		logger.Debug("connection closed successfully")
 	}(conn)
 
 	for {
@@ -80,7 +80,7 @@ func HandleRequest(conn net.Conn, messages chan Record, logger *slog.Logger) {
 				if err != nil {
 					return
 				}
-				messages <- element
+				recordsCannel <- element
 
 			}
 
