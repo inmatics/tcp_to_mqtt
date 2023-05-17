@@ -4,8 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"log"
-
 	"github.com/inmatics/tcp_to_mqtt/pkg/streams"
 )
 
@@ -62,13 +60,25 @@ func parseData(data []byte, imei string) (elements []Record, err error) {
 
 				switch stage {
 				case 1: // One byte IO Elements
-					manageElementValue(elementID, reader.Next(1), &elements[i])
+					err := manageElementValue(elementID, reader.Next(1), &elements[i])
+					if err != nil {
+						return nil, err
+					}
 				case 2: // Two byte IO Elements
-					manageElementValue(elementID, reader.Next(2), &elements[i])
+					err := manageElementValue(elementID, reader.Next(2), &elements[i])
+					if err != nil {
+						return nil, err
+					}
 				case 3: // Four byte IO Elements
-					manageElementValue(elementID, reader.Next(4), &elements[i])
+					err := manageElementValue(elementID, reader.Next(4), &elements[i])
+					if err != nil {
+						return nil, err
+					}
 				case 4: // Eight byte IO Elements
-					manageElementValue(elementID, reader.Next(8), &elements[i])
+					err := manageElementValue(elementID, reader.Next(8), &elements[i])
+					if err != nil {
+						return nil, err
+					}
 				}
 				j++
 			}
@@ -88,13 +98,13 @@ func parseData(data []byte, imei string) (elements []Record, err error) {
 	return
 }
 
-func manageElementValue(key uint16, value []byte, el *Record) {
+func manageElementValue(key uint16, value []byte, el *Record) error {
 	var h Decoder
 	h.elements = make(map[string]map[uint16]AvlEncodeKey)
 	fmbxy := make(map[uint16]AvlEncodeKey)
 	err := json.Unmarshal([]byte(FMBXY), &fmbxy)
 	if err != nil {
-		log.Panic(err)
+		return err
 	}
 
 	h.elements["FMBXY"] = fmbxy
@@ -116,6 +126,8 @@ func manageElementValue(key uint16, value []byte, el *Record) {
 		}
 
 	}
+
+	return nil
 }
 
 type Decoder struct {
