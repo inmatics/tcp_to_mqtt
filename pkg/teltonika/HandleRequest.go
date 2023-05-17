@@ -20,7 +20,7 @@ func HandleRequest(conn net.Conn, recordsCannel chan Record, logger *slog.Logger
 		if err != nil {
 			logger.Error("error closing connection", err)
 		}
-		logger.Info("connection closed successfully")
+		logger.Debug("connection closed successfully")
 	}(conn)
 
 	for {
